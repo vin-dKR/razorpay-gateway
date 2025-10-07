@@ -1,8 +1,14 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { mockProduct, mockReviews } from "@/constants/mockData"
 import { useCreateOrder } from '@/hooks/useCreateOrder';
+
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
 
 const ProductPage: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState(0);
@@ -10,15 +16,41 @@ const ProductPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'description' | 'features' | 'reviews'>('description');
     const { isLoading, data, create } = useCreateOrder()
 
+    const decimalPrice = mockProduct.price / 100
+
+    useEffect(() => {
+        // Dynamically load Razorpay script on mount
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
+
     const handleAddToCart = () => {
         alert(`Added ${quantity} item(s) to cart!`);
     };
 
     const handleBuyNow = async (amount: number) => {
         const res = await create(amount)
-        if (res) {
-            console.log("the ordder created: ", res.data)
+        if (!res?.success) {
+            alert(res?.data)
+            return;
         }
+
+        const order = res.data
+
+        const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+            amount: amount,
+            currency: "INR",
+            name: "Vinod's App",
+            description: "Order Payment",
+            theme: { color: "#3399cc" },
+
+        }
+        console.log(options)
+        const rzp = new window.Razorpay(options)
+        rzp.open()
     };
 
     const discount = mockProduct.originalPrice
@@ -117,7 +149,7 @@ const ProductPage: React.FC = () => {
                                         </span>
                                     )}
                                     <span className="text-3xl font-bold text-gray-900">
-                                        ${mockProduct.price.toFixed(2)}
+                                        Rs.{decimalPrice}
                                     </span>
                                     {discount > 0 && (
                                         <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">
