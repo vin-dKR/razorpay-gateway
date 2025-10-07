@@ -1,7 +1,7 @@
-export const mockProduct: Products = {
+export const mockProduct: Product = {
     id: '1',
     title: 'Wireless Bluetooth Headphones, Noise Cancelling Over Ear Headphones with Microphone',
-    price: 79.99,
+    price: 7999,
     originalPrice: 129.99,
     rating: 4.5,
     reviewCount: 12543,

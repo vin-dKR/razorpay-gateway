@@ -2,18 +2,23 @@
 
 import React, { useState } from 'react';
 import { mockProduct, mockReviews } from "@/constants/mockData"
+import { useCreateOrder } from '@/hooks/useCreateOrder';
 
 const ProductPage: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState<'description' | 'features' | 'reviews'>('description');
+    const { isLoading, data, create } = useCreateOrder()
 
     const handleAddToCart = () => {
         alert(`Added ${quantity} item(s) to cart!`);
     };
 
-    const handleBuyNow = () => {
-        alert('Proceeding to checkout!');
+    const handleBuyNow = async (amount: number) => {
+        const res = await create(amount)
+        if (res) {
+            console.log("the ordder created: ", res.data)
+        }
     };
 
     const discount = mockProduct.originalPrice
@@ -179,7 +184,7 @@ const ProductPage: React.FC = () => {
                                     Add to Cart
                                 </button>
                                 <button
-                                    onClick={handleBuyNow}
+                                    onClick={() => handleBuyNow(mockProduct.price)}
                                     className="w-full bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-full transition-colors duration-200"
                                 >
                                     Buy Now

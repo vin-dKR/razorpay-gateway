@@ -1,4 +1,4 @@
-{ }
+export { }
 
 declare global {
     interface Product {
@@ -29,5 +29,32 @@ declare global {
     interface CartItem {
         product: Product;
         quantity: number;
+    }
+
+    interface RazorpayOrderSuccess {
+        id: string;
+        entity: "order";
+        amount: number;
+        amount_paid: number;
+        amount_due: number;
+        currency: string;
+        receipt: string;
+        offer_id: string | null;
+        status: "created" | "paid" | "attempted";
+        attempts: number;
+        notes: Record<string, string>;
+        created_at: number;
+    }
+
+    interface RazorpayOrderError {
+        error: {
+            code: string;
+            description: string;
+            source: string;
+            step: string;
+            reason: string;
+            metadata: Record<string, any>;
+            field: string;
+        };
     }
 }
